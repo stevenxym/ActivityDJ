@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+        android:title="Network Connection"
+        android:summary="Setting of connection to KINETIC server">
+        <CheckBoxPreference
+            android:key="@string/network_connection_key"
+            android:title="@string/network_connection_title"
+            android:summaryOff="@string/network_enable_off"
+            android:summaryOn="@string/network_enable_on"/>
+        <EditTextPreference
+            android:key="@string/server_address_key"
+            android:title="@string/server_address_title"
+            android:summary="@string/server_address_summary"
+            android:dialogTitle="Enter correct IP address:"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
