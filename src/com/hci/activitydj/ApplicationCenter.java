@@ -9,11 +9,11 @@ public class ApplicationCenter extends Application {
 
 	private NetworkCommunication network;
 	private Handler handler;				// tmp handler to update UI thread
-	private Handler sysHandler;
+	private Handler networkHandler;
 	
 	@Override
 	public void onCreate() {
-		sysHandler = new Handler() {
+		networkHandler = new Handler() {
 			@Override
 			public void handleMessage (Message msg) {
 				Message newMsg = new Message();
@@ -43,7 +43,7 @@ public class ApplicationCenter extends Application {
 		//if (handler == null)
 		//	return false;
 		
-		network = new NetworkCommunication(sysHandler, ip);
+		network = new NetworkCommunication(networkHandler, ip);
 		network.start();		// start daemon
 		
 		if (this.checkConnectionSuccess()) {

@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
-        android:text="play1" />
+        android:text="change" />
 
     <Button
         android:id="@+id/mButton2"
@@ -22,7 +22,7 @@
         android:layout_alignLeft="@+id/mButton1"
         android:layout_below="@+id/mButton1"
         android:layout_marginTop="27dp"
-        android:text="play2" />
+        android:text="stop" />
 
     <TextView
         android:id="@+id/show_text"

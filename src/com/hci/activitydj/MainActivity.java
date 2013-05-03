@@ -11,6 +11,7 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,22 +21,26 @@ import android.widget.TextView;
 @SuppressLint("HandlerLeak")
 public class MainActivity extends Activity {
 	
-	List<Integer> streams;
+//	List<Integer> streams;
 	TextView text;
+	
+	private DJManager dj;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		dj = new DJManager(this);
+		
 		text = (TextView) findViewById(R.id.show_text);
 		text.setText("sssss");
 		
-		final SoundPool pool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-		final int sound1 = pool.load(this, R.raw.sound1, 1);
-		final int sound2 = pool.load(this, R.raw.sound2, 1);
-		
-		streams = new ArrayList<Integer>();
+//		final SoundPool pool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+//		final int sound1 = pool.load(this, R.raw.sound1, 1);
+//		final int sound2 = pool.load(this, R.raw.sound2, 1);
+//		
+//		streams = new ArrayList<Integer>();
 		
 		
 		Button b1 = (Button)findViewById(R.id.mButton1);
@@ -43,11 +48,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-			    float volume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-				int streamId = pool.play(sound1, volume, volume, 1, 0, 1.0f);
-				streams.add(streamId);
+				dj.changeSong();
 			}
 		});
 		
@@ -56,11 +57,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-			    float volume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-				int streamId = pool.play(sound2, volume, volume, 1, 0, 1.0f);
-				streams.add(streamId);
+				dj.stop();
 			}
 		});
 		
@@ -71,6 +68,26 @@ public class MainActivity extends Activity {
 			@Override
 			public void handleMessage (Message msg) {
 				text.setText((String)msg.obj);
+				
+				String msgArray[] = ((String)msg.obj).split(" ");
+				double energy, prevEnergy = 0;
+				double x, prevX = -2;
+				
+				if (msgArray[0].equals("R")) {
+					energy = Double.valueOf(msgArray[3]);
+					x = Double.valueOf(msgArray[2]);
+					
+					if (prevEnergy < 100 && energy >= 100)
+						dj.changeSong();
+					
+					if ((x <= 1 && x >= -1) && (prevX > 1 || prevX < -1))
+						dj.changeSongLoopStatus(-1);
+					else if ((prevX <= 1 && prevX >= -1) && (x > 1 || x < -1))
+						dj.changeSongLoopStatus(0);
+					
+					prevEnergy = energy;
+					prevX = x;
+				}
 			}
 		};
 		appCenter.setHandler(handler);
