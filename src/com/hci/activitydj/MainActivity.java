@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,17 +25,22 @@ public class MainActivity extends Activity {
 //	List<Integer> streams;
 	TextView text;
 	
-	private DJManager dj;
+//	private DJManager dj;
+	private boolean test = true;
+	private actionState s;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		dj = new DJManager(this);
+		final ApplicationCenter appCenter = (ApplicationCenter) getApplication();
+		
+//		dj = new DJManager(this);
 		
 		text = (TextView) findViewById(R.id.show_text);
 		text.setText("sssss");
+		s = actionState.KINETIC_REST;
 		
 //		final SoundPool pool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 //		final int sound1 = pool.load(this, R.raw.sound1, 1);
@@ -42,13 +48,20 @@ public class MainActivity extends Activity {
 //		
 //		streams = new ArrayList<Integer>();
 		
+		final MediaPlayer player = MediaPlayer.create(this, R.raw.sound1);
 		
 		Button b1 = (Button)findViewById(R.id.mButton1);
 		b1.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				dj.changeSong();
+				appCenter.change(s);
+				if (s == actionState.KINETIC_REST)
+					s = actionState.KINETIC_ACT;
+				else
+					s = actionState.KINETIC_REST;
+				
+//				player.start();
 			}
 		});
 		
@@ -57,40 +70,55 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				dj.stop();
+				appCenter.stop();
+//				player.stop();
+			}
+		});
+		
+		Button b3 = (Button)findViewById(R.id.mButton3);
+		b3.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				player.start();
 			}
 		});
 		
 		
 		/** message handler **/
-		ApplicationCenter appCenter = (ApplicationCenter) getApplication();
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage (Message msg) {
 				text.setText((String)msg.obj);
 				
-				String msgArray[] = ((String)msg.obj).split(" ");
-				double energy, prevEnergy = 0;
-				double x, prevX = -2;
-				
-				if (msgArray[0].equals("R")) {
-					energy = Double.valueOf(msgArray[3]);
-					x = Double.valueOf(msgArray[2]);
-					
-					if (prevEnergy < 100 && energy >= 100)
-						dj.changeSong();
-					
-					if ((x <= 1 && x >= -1) && (prevX > 1 || prevX < -1))
-						dj.changeSongLoopStatus(-1);
-					else if ((prevX <= 1 && prevX >= -1) && (x > 1 || x < -1))
-						dj.changeSongLoopStatus(0);
-					
-					prevEnergy = energy;
-					prevX = x;
-				}
+//				String msgArray[] = ((String)msg.obj).split(" ");
+//				double energy, prevEnergy = 0;
+//				double x, prevX = -2;
+//				
+//				if (msgArray[0].equals("R")) {
+//					energy = Double.valueOf(msgArray[3]);
+//					x = Double.valueOf(msgArray[2]);
+//					
+//					if (prevEnergy < 100 && energy >= 100)
+//						dj.changeSong();
+//					
+//					if ((x <= 1 && x >= -1) && (prevX > 1 || prevX < -1)) {
+//						//dj.changeSongLoopStatus(-1);
+//						if (!dj.isPlaying())
+//							dj.changeSong();
+//					} 
+//					if ((prevX <= 1 && prevX >= -1) && (x > 1 || x < -1)) {
+//						dj.changeSongLoopStatus(0);
+//						System.out.println("test.........");
+//					}
+//					
+//					prevEnergy = energy;
+//					prevX = x;
+//				}
 			}
 		};
 		appCenter.setHandler(handler);
+		appCenter.initApplication(this);
 	}
 
 	@Override
