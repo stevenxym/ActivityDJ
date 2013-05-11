@@ -94,8 +94,10 @@ public class DJManager {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
 					Song next = list.pickSongRandom(thisSong, state);
-					if (next != null)
+					if (next != null) {
 						next.play(thisContext);
+						songPlaying = next;
+					}
 				}
 			});
 		}
