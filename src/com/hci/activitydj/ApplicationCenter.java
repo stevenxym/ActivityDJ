@@ -11,17 +11,11 @@ public class ApplicationCenter extends Application {
 	private Handler handler;				// tmp handler to update UI thread
 	private Handler networkHandler;
 	
+	private DJManager dj;
+	private KineticParser kinetic;
+	
 	@Override
 	public void onCreate() {
-		networkHandler = new Handler() {
-			@Override
-			public void handleMessage (Message msg) {
-				Message newMsg = new Message();
-				newMsg.obj = msg.obj;
-				if (handler != null)
-					handler.sendMessage(newMsg);
-			}
-		};
 	}
 	
 	@Override
@@ -33,6 +27,34 @@ public class ApplicationCenter extends Application {
 		handler = h;
 	}
 	
+	public void setContext(Context context) {
+		dj.setContextChanged(context);
+	}
+	
+	public void initApplication(Context context) {
+		dj = new DJManager(context);
+		kinetic = new KineticParser(dj);
+		
+		networkHandler = new Handler() {
+			@Override
+			public void handleMessage (Message msg) {
+				Message newMsg = new Message();
+				newMsg.obj = msg.obj;
+				if (handler != null) {
+					handler.sendMessage(newMsg);
+					kinetic.parseKineticCommand(msg.obj.toString());
+				}
+			}
+		};
+	}
+	
+	public void change(actionState s) {
+		dj.changeSong(s);
+	}
+	
+	public void stop() {
+		dj.stop();
+	}
 	
 	/**
 	 * Network Communication API
@@ -46,7 +68,7 @@ public class ApplicationCenter extends Application {
 		network = new NetworkCommunication(networkHandler, ip);
 		network.start();		// start daemon
 		
-		if (this.checkConnectionSuccess()) {
+		if (!this.checkConnectionSuccess()) {
 			network.showNetworkExceptionAlert(c);
 			return false;
 		}
