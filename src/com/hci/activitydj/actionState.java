@@ -3,6 +3,7 @@ package com.hci.activitydj;
 public enum actionState {
 	KINETIC_REST,
 	KINETIC_ACT,
+	KINETIC_GESTURE,
 	REST,
 	MOVE,
 	NONE;

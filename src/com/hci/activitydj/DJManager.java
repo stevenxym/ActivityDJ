@@ -152,7 +152,7 @@ public class DJManager {
 	private Song songPlaying;		// the song is currently being played
 	private songList list;
 	
-	private Context currentContext;
+	public Context currentContext;
 	
 	/**
 	 * public APIs
@@ -168,6 +168,10 @@ public class DJManager {
 	
 	public boolean isPlaying() {
 		return songPlaying != null;
+	}
+	
+	public actionState getActionState() {
+		return this.songPlaying.state;
 	}
 	
 	public void changeSong(actionState state) {
@@ -203,8 +207,10 @@ public class DJManager {
 	/* load previous prepared songs to own object
 	 * add the song to pool and tracking list */
 	private void initSongList() {
-		list.addSong(new Song(R.raw.sound5,  actionState.KINETIC_REST));
-		list.addSong(new Song(R.raw.sound1,  actionState.KINETIC_ACT));
-		list.addSong(new Song(R.raw.sound2,  actionState.KINETIC_ACT));
+		list.addSong(new Song(R.raw.seg1,  actionState.KINETIC_REST));
+		list.addSong(new Song(R.raw.seg2,  actionState.KINETIC_ACT));
+		list.addSong(new Song(R.raw.sound1,  actionState.KINETIC_GESTURE));
+		list.addSong(new Song(R.raw.sound2,  actionState.KINETIC_GESTURE));
+		
 	}
 }
