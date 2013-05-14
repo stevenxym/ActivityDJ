@@ -1,5 +1,8 @@
 package com.hci.activitydj;
 
+import java.util.HashMap;
+
+import android.media.MediaPlayer;
 import android.util.Log;
 
 public class KineticParser {
@@ -160,10 +163,13 @@ public class KineticParser {
 	private positionRecorder pRecorder;
 	private DJManager dj;
 	private boolean start;
+	public HashMap<String, Integer> gesturesHashMap;
+	private String prevGesture = "";
 	
 	public KineticParser(DJManager dj) {
 		eRecorder = new energyRecorder();
 		pRecorder = new positionRecorder();
+		this.gesturesHashMap = new HashMap<String, Integer>();
 		this.dj = dj;
 		this.start = true;
 	}
@@ -179,10 +185,10 @@ public class KineticParser {
 			if (cmdArray.length != 4)
 				return;
 			
-//			actionState kineticState = this.eRecorder.setEnergyStatus(Double.valueOf(cmdArray[3]));
-//				//Log.d("debug", "change song now\n");
-//			if (kineticState != actionState.NONE)
-//				dj.changeSong(kineticState);
+			actionState kineticState = this.eRecorder.setEnergyStatus(Double.valueOf(cmdArray[3]));
+				Log.d("debug", "ENERGY: change song now\n");
+			if (kineticState != actionState.NONE)
+				dj.changeSong(kineticState);
 			
 			if (this.pRecorder.setPositionStatus(Double.valueOf(cmdArray[2]))) {
 				if (start)
@@ -194,8 +200,27 @@ public class KineticParser {
 			
 		} else if (cmdArray[0].equals("G")) {
 			
-			if (cmdArray.length != 2)
+			if (cmdArray.length < 2)
 				return;
+			
+			MediaPlayer player = MediaPlayer.create(dj.currentContext , R.raw.sound1);
+			player.start();
+			
+			String gArray[] = cmd.split("@");
+			
+			Integer count = gesturesHashMap.get(gArray[gArray.length - 1]);
+			if (count == null) {
+				gesturesHashMap.put(gArray[gArray.length - 1], 1);
+			}
+			else {
+				gesturesHashMap.put(gArray[gArray.length - 1], count + 1);
+			}
+			
+			if (prevGesture.equals(gArray[gArray.length - 1]) && !dj.getActionState().equals(actionState.KINETIC_ACT)){
+				dj.changeSong(actionState.KINETIC_ACT);
+			}
+			
+			prevGesture = gArray[gArray.length - 1];
 			
 			//if (cmdArray[1].equals("1"))
 				//dj.playQuick();
