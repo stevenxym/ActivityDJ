@@ -102,6 +102,11 @@ public class DJManager {
 			});
 		}
 		
+		public void playQuick(Context context) {
+			player = MediaPlayer.create(context, songId);
+			player.start();
+		}
+		
 		public void stop() {
 			if (player != null)
 				player.stop();
@@ -113,8 +118,8 @@ public class DJManager {
 		private ArrayList[] songs;
 		
 		public songList() {
-			songs = new ArrayList [4];
-			for (int i = 0; i < 4; i++)
+			songs = new ArrayList [5];
+			for (int i = 0; i < 5; i++)
 				songs[i] = new ArrayList<Song>();
 		}
 		
@@ -147,6 +152,10 @@ public class DJManager {
 					return next;
 			}
 		}
+		
+		public Song pickGestureSeg() {
+			return ((ArrayList<Song>)songs[4]).get(0);
+		}
 	}
 	
 	private Song songPlaying;		// the song is currently being played
@@ -174,7 +183,7 @@ public class DJManager {
 	}
 	
 	public actionState getActionState() {
-		return this.songPlaying.state;
+		return this.songPlaying != null ? this.songPlaying.state : actionState.NONE;
 	}
 	
 	public void changeSong(actionState state) {
@@ -215,6 +224,10 @@ public class DJManager {
 		this.KineticConnected = false;
 	}
 	
+	public void playGestureSeg() {
+		this.list.pickGestureSeg().playQuick(currentContext);
+	}
+	
 	
 	/**
 	 * helper functions
@@ -226,7 +239,7 @@ public class DJManager {
 		list.addSong(new Song(R.raw.seg1,  actionState.KINETIC_REST));
 		list.addSong(new Song(R.raw.seg2,  actionState.KINETIC_ACT));
 		list.addSong(new Song(R.raw.sound1,  actionState.KINETIC_GESTURE));
-		list.addSong(new Song(R.raw.sound2,  actionState.KINETIC_GESTURE));
+		//list.addSong(new Song(R.raw.sound2,  actionState.KINETIC_GESTURE));
 		
 	}
 }

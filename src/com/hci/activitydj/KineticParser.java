@@ -126,11 +126,11 @@ public class KineticParser {
 			checkPoint = -1;
 		}
 		
-		public boolean setPositionStatus(double pos) {
+		public actionState setPositionStatus(double pos) {
 			
 			if (this.waitCheckPoint != -1) {
 				if (System.currentTimeMillis() <= (this.waitInterval + this.waitCheckPoint))
-					return false;
+					return actionState.NONE;
 				else
 					this.waitCheckPoint = -1;
 			}
@@ -139,7 +139,7 @@ public class KineticParser {
 			if (this.checkPoint == -1) {
 				this.pStatus = current.finishChecking();
 				this.checkPoint = System.currentTimeMillis();
-				return true;
+				return pStatus.isOutRange() ? actionState.KINETIC_ACT : actionState.KINETIC_REST;
 			}
 			
 			if (this.pStatus.isOutRange() == current.isOutRange()) {
@@ -147,7 +147,7 @@ public class KineticParser {
 					if (System.currentTimeMillis() >= (this.checkPoint + this.timerInterval)) {
 						this.pStatus = this.pStatus.finishChecking();
 						this.waitCheckPoint = System.currentTimeMillis();
-						return true;
+						return pStatus.isOutRange() ? actionState.KINETIC_ACT : actionState.KINETIC_REST;
 					}
 				}
 			} else {
@@ -155,14 +155,14 @@ public class KineticParser {
 				this.pStatus = current;
 			}
 			
-			return false;
+			return actionState.NONE;
 		}
 	}
 	
 	private energyRecorder eRecorder;
 	private positionRecorder pRecorder;
 	private DJManager dj;
-	private boolean start;
+//	private boolean start;
 	public HashMap<String, Integer> gesturesHashMap;
 	private String prevGesture = "";
 	
@@ -171,7 +171,7 @@ public class KineticParser {
 		pRecorder = new positionRecorder();
 		this.gesturesHashMap = new HashMap<String, Integer>();
 		this.dj = dj;
-		this.start = true;
+//		this.start = true;
 	}
 	
 	public void parseKineticCommand(String cmd) {
@@ -184,18 +184,19 @@ public class KineticParser {
 			
 			if (cmdArray.length != 4)
 				return;
+//			
+//			actionState kineticState = this.eRecorder.setEnergyStatus(Double.valueOf(cmdArray[3]));
+//				Log.d("debug", "ENERGY: change song now\n");
+//			if (kineticState != actionState.NONE)
+//				dj.changeSong(kineticState);
 			
-			actionState kineticState = this.eRecorder.setEnergyStatus(Double.valueOf(cmdArray[3]));
-				Log.d("debug", "ENERGY: change song now\n");
-			if (kineticState != actionState.NONE)
-				dj.changeSong(kineticState);
-			
-			if (this.pRecorder.setPositionStatus(Double.valueOf(cmdArray[2]))) {
-				if (start)
+			actionState pos = this.pRecorder.setPositionStatus(Double.valueOf(cmdArray[2]));
+			if (pos != actionState.NONE) {
+				if (pos == actionState.KINETIC_REST)
 					dj.changeSong(actionState.KINETIC_REST);
 				else
 					dj.stop();
-				start = !start;
+//				start = !start;
 			}
 			
 		} else if (cmdArray[0].equals("G")) {
@@ -203,8 +204,9 @@ public class KineticParser {
 			if (cmdArray.length < 2)
 				return;
 			
-			MediaPlayer player = MediaPlayer.create(dj.currentContext , R.raw.sound1);
-			player.start();
+//			MediaPlayer player = MediaPlayer.create(dj.currentContext , R.raw.sound1);
+//			player.start();
+			dj.playGestureSeg();
 			
 			String gArray[] = cmd.split("@");
 			
@@ -222,8 +224,6 @@ public class KineticParser {
 			
 			prevGesture = gArray[gArray.length - 1];
 			
-			//if (cmdArray[1].equals("1"))
-				//dj.playQuick();
 		}
 	}
 }

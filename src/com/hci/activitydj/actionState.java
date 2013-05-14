@@ -18,6 +18,8 @@ public enum actionState {
 			return 2;
 		case MOVE:
 			return 3;
+		case KINETIC_GESTURE:
+			return 4;
 		default:
 			return -1;
 		}
