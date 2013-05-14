@@ -21,4 +21,8 @@ public enum actionState {
 			return -1;
 		}
 	}
+	
+	public boolean isKineticState() {
+		return this == KINETIC_REST || this == KINETIC_ACT;
+	}
 }

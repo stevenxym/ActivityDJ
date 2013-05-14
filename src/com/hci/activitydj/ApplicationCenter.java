@@ -73,6 +73,8 @@ public class ApplicationCenter extends Application {
 			return false;
 		}
 		
+		dj.setKineticConnected();
+		
 		return true;
 	}
 	
@@ -103,6 +105,7 @@ public class ApplicationCenter extends Application {
 		if (network != null) {
 			network.stopCommunication();
 			network = null;
+			dj.setKineticDisconnected();
 		}
 	}
 	

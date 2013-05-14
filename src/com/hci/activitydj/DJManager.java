@@ -154,6 +154,8 @@ public class DJManager {
 	
 	private Context currentContext;
 	
+	private boolean KineticConnected;
+	
 	/**
 	 * public APIs
 	 */
@@ -162,6 +164,7 @@ public class DJManager {
 		songPlaying = null;
 		list = new songList();
 		currentContext = context;
+		this.KineticConnected = false;
 		
 		this.initSongList();
 	}
@@ -171,6 +174,11 @@ public class DJManager {
 	}
 	
 	public void changeSong(actionState state) {
+		
+		// ignore sensors request if Kinetic is connected
+		if (this.KineticConnected && !state.isKineticState())
+			return;
+		
 		if (songPlaying != null)
 			songPlaying.stop();
 //			songPlaying.setLoopMode(pool, 0);
@@ -193,6 +201,14 @@ public class DJManager {
 	
 	public void setContextChanged(Context newContext) {
 		this.currentContext = newContext;
+	}
+	
+	public void setKineticConnected() {
+		this.KineticConnected = true;
+	}
+	
+	public void setKineticDisconnected() {
+		this.KineticConnected = false;
 	}
 	
 	
